@@ -1,24 +1,35 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { Stack } from "expo-router";
+import { useEffect, useState } from "react";
+import { useAuthStore } from "../store/authStore";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!);
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+    const setUserEmail = useAuthStore((state) => state.setUserEmail);
+    const [isHydrated, setIsHydrated] = useState(false);
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    useEffect(() => {
+        const loadUser = async () => {
+            const email = await AsyncStorage.getItem("userEmail");
+            console.log("HYDRATE ROOT:", email);
+
+            setUserEmail(email); // 🔥 isi Zustand di awal
+            setIsHydrated(true);
+        };
+
+        loadUser();
+    }, []);
+
+    // 🔥 tahan render sampai selesai ambil data
+    if (!isHydrated) return null;
+    return (
+        <ConvexProvider client={convex}>
+            <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="product/[id]" />
+            </Stack>
+        </ConvexProvider>
+    );
 }

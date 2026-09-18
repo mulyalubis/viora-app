@@ -1,98 +1,109 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { router } from "expo-router";
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const { width, height } = Dimensions.get('window');
 
-export default function HomeScreen() {
+const customModeConfig = {
+  parallaxScrollingScale: 0.75,
+  parallaxScrollingOffset: 110,
+};
+
+const data = [
+  { id: 1, title: "Lavojoy", image: require("../../assets/images/lavojoy.jpg"), },
+  { id: 2, title: "OMG", image: require("../../assets/images/fix-and-lock.jpg"), },
+  { id: 3, title: "Skindose", image: require("../../assets/images/skindose.jpg"), },
+];
+
+const CARD_WIDTH = width * 1;
+const CARD_HEIGHT = Math.min(height * 0.67, 550);
+
+export default function Index() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
+    <View style={styles.container}>
+      <Text style={styles.title}>VIORA</Text>
+      <View style={{
+        position: "relative",
+      }}>
+        <Text style={styles.subtitle}>Beautify yourself with the best touch from</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/product")}>
+          <Text style={{ color: "#fff", }}>Best Product</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <Carousel
+          loop
+          width={CARD_WIDTH}
+          height={CARD_HEIGHT}
+          style={{
+            width: width,
+            justifyContent: 'center',
+            marginTop: -(height * 0.045),
+          }}
+          autoPlay={true}
+          autoPlayInterval={3000}
+          scrollAnimationDuration={2000}
+          mode="parallax"
+          modeConfig={customModeConfig}
+          data={data}
+          renderItem={({ item }) => (
+            <View style={styles.cardContainer}>
+              <Image
+                source={item.image}
+                style={styles.image}
               />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+            </View>
+          )}
+        />
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    paddingTop: height * 0.08,
+    alignItems: "center",
+    backgroundColor: "#E3DFD3",
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  cardContainer: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: 'white',
+    // Shadow untuk iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    // Shadow untuk Android
+    elevation: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  button: {
+    position: "absolute",
+    alignSelf: "center",
+    bottom: 7,
+    backgroundColor: '#92A390',
+    padding: 10,
+    borderRadius: 10,
+    zIndex: 10,
+  },
+  title: {
+    fontSize: width * 0.15,
+    color: "#92A390",
+  },
+  subtitle: {
+    fontSize: width * 0.13,
+    color: "#000",
+    paddingHorizontal: 20,
+    marginTop: 5,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });
+
+
